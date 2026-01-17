@@ -352,8 +352,12 @@ export async function onRequest(context) {
           await env.DB.prepare("UPDATE notes SET view_count = ? WHERE public_id = ?").bind(newCount, shareId).run();
         }
         
+        // 分享内容需要先用服务端密钥解密，得到用户密码加密的内容
+        const serverKey = env.SERVER_ENCRYPT_KEY || 'default-server-key-change-in-production';
+        const userEncryptedContent = decryptContent(note.content, serverKey);
+        
         return Response.json({ 
-          content: note.content, 
+          content: userEncryptedContent, // 返回用户密码加密的内容
           view_count: newCount,
           view_limit: note.view_limit,
           is_last_view: note.view_limit > 0 && newCount >= note.view_limit
