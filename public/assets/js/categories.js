@@ -78,7 +78,7 @@ async function loadCategoriesList() {
         console.warn('加载分类列表失败:', error.message);
         if (!isDevEnvironment()) {
             console.error('加载分类列表失败:', error);
-            showToast('加载分类列表失败', 'error');
+            showToast('无法加载分类列表，请检查网络连接', 'error');
         }
     }
 }
@@ -95,7 +95,7 @@ function handleEditCategory(code, currentName) {
                 showToast('分类名称已更新', 'success');
                 loadCategoriesList();
             } else {
-                showToast('更新失败', 'error');
+                showToast('分类名称更新未完成，请重试', 'error');
             }
         }
     );
@@ -106,7 +106,7 @@ async function handleChangeCategory(noteId, currentCategoryCode) {
     // 获取所有分类
     const data = await getCategories();
     if (!data || !data.categories) {
-        showToast('获取分类列表失败', 'error');
+        showToast('无法获取分类列表，请检查网络连接', 'error');
         return;
     }
     
@@ -161,7 +161,7 @@ async function handleChangeCategory(noteId, currentCategoryCode) {
             modal.remove();
             loadNotesList();
         } else {
-            showToast('更改失败', 'error');
+            showToast('笔记分类更改未完成，请重试', 'error');
         }
     };
 }
@@ -185,7 +185,7 @@ async function handleDeleteCategory(code, name) {
                     loadCategoriesList();
                 }
             } else {
-                showToast('删除失败', 'error');
+                showToast('分类删除操作未完成，请重试', 'error');
             }
         },
         'danger'

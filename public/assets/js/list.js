@@ -40,7 +40,7 @@ async function loadCategories() {
         console.warn('加载分类失败:', error.message);
         if (!isDevEnvironment()) {
             console.error('加载分类失败:', error);
-            showToast('加载分类失败', 'error');
+            showToast('无法加载分类数据，请检查网络连接', 'error');
         }
     }
 }
@@ -164,9 +164,9 @@ function updateBatchDeleteBtn() {
 async function handleRefresh() {
     try {
         await loadNotesList();
-        showToast('刷新成功', 'success');
+        showToast('数据刷新完成', 'success');
     } catch (error) {
-        showToast('刷新失败', 'error');
+        showToast('刷新数据时出现问题，请检查网络连接', 'error');
     }
 }
 
@@ -189,7 +189,7 @@ async function handleBatchDelete() {
                 }
                 loadNotesList();
             } else {
-                showToast('删除失败', 'error');
+                showToast('删除操作未完成，请检查网络连接后重试', 'error');
             }
         },
         'danger'

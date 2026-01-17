@@ -65,10 +65,10 @@ async function handleSaveNote() {
             document.getElementById('noteInput').value = '';
             document.getElementById('noteCategory').value = 'default';
             updateCharCount(); // 重置字数统计
-            showToast('保存成功！', 'success');
+            showToast('笔记保存成功！', 'success');
         }
     } catch (error) {
-        showToast('保存失败：' + error.message, 'error');
+        showToast('笔记保存失败：' + error.message, 'error');
     } finally {
         LoadingManager.hide('saveNote');
     }
@@ -95,7 +95,7 @@ async function handleRefresh() {
         showToast('刷新完成', 'success');
     } catch (error) {
         console.error('刷新失败:', error);
-        showToast('刷新失败，请重试', 'error');
+        showToast('数据刷新时出现问题，请检查网络连接', 'error');
     } finally {
         AppConfig.isRefreshing = false;
     }
@@ -225,7 +225,7 @@ async function loadNotesList() {
         console.warn('加载笔记列表失败:', error.message);
         if (!isDevEnvironment()) {
             console.error('加载笔记列表失败:', error);
-            showToast('加载笔记列表失败', 'error');
+            showToast('无法加载笔记列表，请检查网络连接', 'error');
         }
     } finally {
         LoadingManager.hide('loadNotes');
@@ -306,11 +306,11 @@ async function saveEditedNote(id) {
     const result = await updateNote(id, content, category);
     
     if (result) {
-        showToast('更新成功！', 'success');
+        showToast('笔记内容更新成功！', 'success');
         document.querySelector('.fixed').remove(); // 关闭模态框
         loadNotesList();
     } else {
-        showToast('更新失败', 'error');
+        showToast('笔记更新未完成，请重试', 'error');
     }
 }
 
@@ -321,10 +321,10 @@ async function handleDeleteNote(id) {
         async () => {
             const result = await deleteNotes([id]);
             if (result) {
-                showToast('删除成功', 'success');
+                showToast('笔记删除成功', 'success');
                 loadNotesList();
             } else {
-                showToast('删除失败', 'error');
+                showToast('笔记删除未完成，请重试', 'error');
             }
         },
         'danger'

@@ -121,7 +121,7 @@ async function handleCreateShare(content, btn) {
         
         btn.textContent = '✅ 已生成';
     } catch (error) {
-        showToast('生成分享链接失败：' + error.message, 'error');
+        showToast('分享链接生成失败：' + error.message, 'error');
         btn.disabled = false;
         btn.textContent = '🔗 生成分享链接';
     }
