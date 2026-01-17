@@ -154,8 +154,8 @@ function deobfuscateWithSession(obfuscatedData, url) {
 
 // 混淆API请求数据（兼容旧函数名）
 function obfuscateRequestData(data, url) {
-    // 对于登录请求，使用基础混淆（因为还没有会话信息）
-    if (url === '/api/login' || url === '/api/captcha') {
+    // 对于登录请求和分享请求，使用基础混淆（因为还没有会话信息或不需要管理员权限）
+    if (url === '/api/login' || url === '/api/captcha' || url === '/api/share') {
         return obfuscateRequestDataBasic(data, url);
     }
     // 其他请求使用会话混淆
@@ -164,8 +164,8 @@ function obfuscateRequestData(data, url) {
 
 // 解混淆API响应数据（兼容旧函数名）
 function deobfuscateResponseData(obfuscatedData, url) {
-    // 对于登录响应，使用基础解混淆
-    if (url === '/api/login' || url === '/api/captcha') {
+    // 对于登录响应和分享响应，使用基础解混淆
+    if (url === '/api/login' || url === '/api/captcha' || url === '/api/share') {
         return deobfuscateResponseDataBasic(obfuscatedData, url);
     }
     // 其他响应使用会话解混淆

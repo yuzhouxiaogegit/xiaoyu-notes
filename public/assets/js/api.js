@@ -658,11 +658,16 @@ async function createShareLink(content, view_limit = -1) {
     
     // 生产环境：调用真实API
     const pid = crypto.randomUUID();
-    await apiRequest('/api/save', {
+    const result = await apiRequest('/api/save', {
         method: 'POST',
         body: JSON.stringify({ content, view_limit, public_id: pid, is_share: true })
     });
-    return `${location.origin}?share=${pid}`;
+    
+    if (result && result.status === 'OK') {
+        return `${location.origin}?share=${pid}`;
+    } else {
+        throw new Error('创建分享链接失败');
+    }
 }
 
 // 获取分享内容（改为POST，避免URL暴露分享ID）
@@ -709,28 +714,37 @@ async function getShareContent(shareId) {
     }
     
     // 生产环境：调用真实API
-    const response = await fetch(`${AppConfig.API_URL}/api/share`, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'X-Obfuscated': 'true'
-        },
-        body: JSON.stringify(obfuscateRequestData({ shareId }, '/api/share'))
-    });
-    
-    if (!response.ok) return null;
-    
-    let data = await response.json();
-    
-    // 如果服务端返回混淆数据，进行解混淆
-    if (response.headers.get('X-Obfuscated') === 'true' && data.payload) {
-        const deobfuscatedData = deobfuscateResponseData(data, '/api/share');
-        if (deobfuscatedData) {
-            data = deobfuscatedData;
+    try {
+        const response = await fetch(`${AppConfig.API_URL}/api/share`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Obfuscated': 'true'
+            },
+            body: JSON.stringify(obfuscateRequestData({ shareId }, '/api/share'))
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('分享API错误:', errorData);
+            return null;
         }
+        
+        let data = await response.json();
+        
+        // 如果服务端返回混淆数据，进行解混淆
+        if (response.headers.get('X-Obfuscated') === 'true' && data.payload) {
+            const deobfuscatedData = deobfuscateResponseData(data, '/api/share');
+            if (deobfuscatedData) {
+                data = deobfuscatedData;
+            }
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('获取分享内容失败:', error);
+        return null;
     }
-    
-    return data;
 }
 
 // AI 总结

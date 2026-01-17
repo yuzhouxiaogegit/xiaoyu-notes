@@ -329,7 +329,20 @@ export async function onRequest(context) {
     // 阅后即焚接口（改为POST）
     if (url.pathname === "/api/share" && request.method === "POST") {
       try {
-        const { shareId } = await getRequestData();
+        // 分享API使用基础解混淆，不需要管理员权限
+        let requestData = await request.json();
+        
+        // 检查是否是混淆数据
+        if (request.headers.get('X-Obfuscated') === 'true' && requestData.payload) {
+          const deobfuscatedData = deobfuscateRequestData(requestData, url.pathname);
+          if (deobfuscatedData) {
+            requestData = deobfuscatedData;
+          } else {
+            return Response.json({ error: "数据解析失败" }, { status: 400, headers: corsHeaders });
+          }
+        }
+        
+        const { shareId } = requestData;
         const note = await env.DB.prepare("SELECT * FROM notes WHERE public_id = ? AND is_share_copy = 1").bind(shareId).first();
         
         if (!note) {
