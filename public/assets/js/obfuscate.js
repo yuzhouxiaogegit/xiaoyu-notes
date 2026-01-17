@@ -118,12 +118,95 @@ function obfuscateWithSession(data, url) {
     return obfuscatedData;
 }
 
+// 增强版：结合会话信息的解混淆
+function deobfuscateWithSession(obfuscatedData, url) {
+    try {
+        const { payload, timestamp, checksum } = obfuscatedData;
+        const sessionToken = localStorage.getItem('login_token') || '';
+        const adminKey = AppConfig.ADMIN_KEY || '';
+        
+        // 验证校验和
+        const expectedChecksum = btoa(url + timestamp + sessionToken.slice(0, 8));
+        if (checksum !== expectedChecksum) {
+            return null;
+        }
+        
+        // 验证时间戳（防止重放攻击，允许5分钟误差）
+        const now = Date.now();
+        if (Math.abs(now - timestamp) > 5 * 60 * 1000) {
+            return null;
+        }
+        
+        // 重新计算salt
+        const sessionHash = (sessionToken + adminKey).split('').reduce((hash, char) => {
+            return ((hash << 5) - hash) + char.charCodeAt(0);
+        }, 0);
+        
+        const baseSalt = generateDynamicSalt(url, timestamp);
+        const finalSalt = Math.abs((baseSalt + sessionHash) % 127) + 1;
+        
+        return Decode(payload, -finalSalt); // 解密时使用负salt
+        
+    } catch (error) {
+        return null;
+    }
+}
+
 // 混淆API请求数据（兼容旧函数名）
 function obfuscateRequestData(data, url) {
+    // 对于登录请求，使用基础混淆（因为还没有会话信息）
+    if (url === '/api/login' || url === '/api/captcha') {
+        return obfuscateRequestDataBasic(data, url);
+    }
+    // 其他请求使用会话混淆
     return obfuscateWithSession(data, url);
 }
 
 // 解混淆API响应数据（兼容旧函数名）
 function deobfuscateResponseData(obfuscatedData, url) {
+    // 对于登录响应，使用基础解混淆
+    if (url === '/api/login' || url === '/api/captcha') {
+        return deobfuscateResponseDataBasic(obfuscatedData, url);
+    }
+    // 其他响应使用会话解混淆
     return deobfuscateWithSession(obfuscatedData, url);
+}
+
+// 基础混淆（不依赖会话信息）
+function obfuscateRequestDataBasic(data, url) {
+    const timestamp = Date.now();
+    const salt = generateDynamicSalt(url, timestamp);
+    
+    const obfuscatedData = {
+        payload: Encode(data, salt),
+        timestamp: timestamp,
+        checksum: btoa(url + timestamp) // 简单的校验和
+    };
+    
+    return obfuscatedData;
+}
+
+// 基础解混淆（不依赖会话信息）
+function deobfuscateResponseDataBasic(obfuscatedData, url) {
+    try {
+        const { payload, timestamp, checksum } = obfuscatedData;
+        
+        // 验证校验和
+        const expectedChecksum = btoa(url + timestamp);
+        if (checksum !== expectedChecksum) {
+            return null;
+        }
+        
+        // 验证时间戳（防止重放攻击，允许5分钟误差）
+        const now = Date.now();
+        if (Math.abs(now - timestamp) > 5 * 60 * 1000) {
+            return null;
+        }
+        
+        const salt = generateDynamicSalt(url, timestamp);
+        return Decode(payload, -salt); // 解密时使用负salt
+        
+    } catch (error) {
+        return null;
+    }
 }

@@ -168,6 +168,7 @@ class AuthAPI {
         
         try {
             const loginData = { username, password, captcha, captchaToken };
+            // 登录时使用基础混淆，因为还没有会话信息
             const obfuscatedData = obfuscateRequestData(loginData, '/api/login');
             
             const response = await fetch(`${AppConfig.API_URL}/api/login`, {
@@ -181,6 +182,7 @@ class AuthAPI {
             
             let data = await response.json();
             
+            // 登录响应也使用基础解混淆
             if (response.headers.get('X-Obfuscated') === 'true' && data.payload) {
                 const deobfuscatedData = deobfuscateResponseData(data, '/api/login');
                 if (deobfuscatedData) {
@@ -189,13 +191,13 @@ class AuthAPI {
             }
             
             if (!response.ok) {
-                return { error: data.error };
+                return { error: data.error || '登录失败' };
             }
             
             return data;
         } catch (error) {
-            showToast('登录失败: ' + error.message, 'error');
-            return null;
+            console.error('登录请求失败:', error);
+            return { error: '网络连接失败，请检查网络后重试' };
         }
     }
 
