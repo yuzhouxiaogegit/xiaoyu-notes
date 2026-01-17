@@ -5,6 +5,43 @@
  * 版权所有 © 2025 宇宙小哥
  */
 
+// 简单的服务端加密函数（基于环境变量中的密钥）
+function encryptContent(text, key) {
+  try {
+    // 使用简单的XOR加密（生产环境建议使用更强的加密）
+    const keyBytes = new TextEncoder().encode(key);
+    const textBytes = new TextEncoder().encode(text);
+    const encrypted = new Uint8Array(textBytes.length);
+    
+    for (let i = 0; i < textBytes.length; i++) {
+      encrypted[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+    }
+    
+    // 转换为base64
+    return btoa(String.fromCharCode(...encrypted));
+  } catch (e) {
+    return text; // 加密失败时返回原文
+  }
+}
+
+// 简单的服务端解密函数
+function decryptContent(encryptedText, key) {
+  try {
+    // 从base64解码
+    const encrypted = new Uint8Array(atob(encryptedText).split('').map(c => c.charCodeAt(0)));
+    const keyBytes = new TextEncoder().encode(key);
+    const decrypted = new Uint8Array(encrypted.length);
+    
+    for (let i = 0; i < encrypted.length; i++) {
+      decrypted[i] = encrypted[i] ^ keyBytes[i % keyBytes.length];
+    }
+    
+    return new TextDecoder().decode(decrypted);
+  } catch (e) {
+    return encryptedText; // 解密失败时返回原文
+  }
+}
+
 // 数据解混淆函数（服务端）
 function Decode(strJson, salt) {
   let strArr = JSON.stringify(strJson).replace(/[\[|\]|\"|\']/g, '').split(',');
@@ -443,10 +480,14 @@ export async function onRequest(context) {
       try {
         const { content, category_code, view_limit, public_id, is_share } = await getRequestData();
         
+        // 使用服务端密钥加密内容
+        const serverKey = env.SERVER_ENCRYPT_KEY || 'default-server-key-change-in-production';
+        const encryptedContent = encryptContent(content, serverKey);
+        
         await env.DB.prepare(
           "INSERT OR REPLACE INTO notes (content, category_code, view_limit, public_id, is_share_copy) VALUES (?, ?, ?, ?, ?)"
         ).bind(
-          content, 
+          encryptedContent, // 存储加密后的内容
           category_code || 'default', 
           view_limit !== undefined ? view_limit : -1,
           public_id || null, 
@@ -479,9 +520,13 @@ export async function onRequest(context) {
       try {
         const { id, content, category_code } = await getRequestData();
         
+        // 使用服务端密钥加密内容
+        const serverKey = env.SERVER_ENCRYPT_KEY || 'default-server-key-change-in-production';
+        const encryptedContent = encryptContent(content, serverKey);
+        
         await env.DB.prepare(
           "UPDATE notes SET content = ?, category_code = ? WHERE id = ? AND is_share_copy = 0"
-        ).bind(content, category_code || 'default', id).run();
+        ).bind(encryptedContent, category_code || 'default', id).run();
         
         return Response.json({ status: "OK" }, { headers: corsHeaders });
       } catch (error) {
@@ -513,8 +558,15 @@ export async function onRequest(context) {
         const { results } = await env.DB.prepare(query).bind(...params).all();
         const countRes = await env.DB.prepare(countQuery).bind(...countParams).first();
 
+        // 解密笔记内容
+        const serverKey = env.SERVER_ENCRYPT_KEY || 'default-server-key-change-in-production';
+        const decryptedResults = results.map(note => ({
+          ...note,
+          content: decryptContent(note.content, serverKey) // 解密后返回明文
+        }));
+
         return Response.json({
-          data: results,
+          data: decryptedResults,
           total: countRes.total,
           page: page,
           limit: limit

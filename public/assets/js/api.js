@@ -568,7 +568,7 @@ async function getNotes(page = 1, category = 'all') {
         
         // 模拟后端解密过程：将存储的加密内容解密为明文
         const decryptedNotes = [];
-        const serverKey = 'server-key-dev'; // 与保存时使用的密钥一致
+        const serverKey = 'server-key-dev'; // 开发环境使用固定密钥
         
         for (const note of allNotes) {
             try {
@@ -604,7 +604,7 @@ async function getNotes(page = 1, category = 'all') {
         };
     }
     
-    // 生产环境：调用真实API
+    // 生产环境：调用真实API，后端已解密返回明文内容
     return await apiRequest('/api/list', {
         method: 'POST',
         body: JSON.stringify({ 

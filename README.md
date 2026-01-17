@@ -173,11 +173,12 @@ xiaoyu-notes/
 
 ### 环境变量
 
-| 变量名           | 说明       | 示例值                 |
-| ---------------- | ---------- | ---------------------- |
-| `LOGIN_USERNAME` | 登录用户名 | `admin`                |
-| `LOGIN_PASSWORD` | 登录密码   | `your-secure-password` |
-| `ADMIN_KEY`      | 管理员密钥 | `your-admin-key-here`  |
+| 变量名               | 说明           | 示例值                    |
+| -------------------- | -------------- | ------------------------- |
+| `LOGIN_USERNAME`     | 登录用户名     | `admin`                   |
+| `LOGIN_PASSWORD`     | 登录密码       | `your-secure-password`    |
+| `ADMIN_KEY`          | 管理员密钥     | `your-admin-key-here`     |
+| `SERVER_ENCRYPT_KEY` | 服务端加密密钥 | `your-server-encrypt-key` |
 
 ### 数据库配置
 

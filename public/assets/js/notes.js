@@ -49,19 +49,17 @@ async function handleSaveNote() {
     // 检查是否为本地开发环境
     const isLocalDev = isDevEnvironment();
     
-    // 生产环境需要检查ADMIN_KEY
-    if (!isLocalDev && !AppConfig.ADMIN_KEY) {
-        showToast('请先在系统设置中配置管理密钥', 'warning');
+    // 生产环境需要检查登录状态
+    if (!isLocalDev && !isLoggedIn()) {
+        showToast('请先登录', 'warning');
         return;
     }
     
     LoadingManager.show('saveNote', '正在保存笔记...');
     
     try {
-        // 使用服务端密钥加密内容（前端用固定密钥，后端会用真实的服务端密钥）
-        const serverKey = isLocalDev ? 'server-key-dev' : 'server-key-prod';
-        const encrypted = await encrypt(content, serverKey);
-        const result = await saveNote(encrypted, category);
+        // 直接发送明文内容，后端负责加密存储
+        const result = await saveNote(content, category);
         
         if (result) {
             document.getElementById('noteInput').value = '';
@@ -78,8 +76,8 @@ async function handleSaveNote() {
 
 // 加载笔记列表
 async function loadNotesList() {
-    // 检查是否已登录且有管理员密钥（开发环境跳过检查）
-    if (!isDevEnvironment() && !AppConfig.ADMIN_KEY) {
+    // 检查是否已登录（开发环境跳过检查）
+    if (!isDevEnvironment() && !isLoggedIn()) {
         const listDiv = document.getElementById('notesList');
         if (listDiv) {
             listDiv.innerHTML = `
