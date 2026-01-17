@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!--
+    小宇笔记 - 加密笔记管理系统
+    作者：宇宙小哥
+    项目地址：https://github.com/yuzhouxiaogegit/xiaoyu-notes
+    版权所有 © 2025 宇宙小哥
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">加载中...</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#0f172a" id="themeColor">
+    <!-- 使用 Tailwind CSS 官方 CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+        // Tailwind CSS 配置 - 保持与原项目一致
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            950: '#020617'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body class="min-h-screen bg-slate-900 text-slate-200"
+    style="background: linear-gradient(135deg, #1e293b, #334155 50%, #475569); background-attachment: fixed;">
+    <div id="app" class="flex h-screen overflow-hidden"></div>
+
+    <!-- 脚本加载 -->
+    <script src="assets/js/app-config.js"></script>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/crypto.js"></script>
+    <script src="assets/js/obfuscate.js"></script>
+    <script src="assets/js/ui.js"></script>
+
+    <!-- API和视图 -->
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/views.js"></script>
+
+    <!-- 功能模块 -->
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/notes.js"></script>
+    <script src="assets/js/categories.js"></script>
+    <script src="assets/js/list.js"></script>
+    <script src="assets/js/share.js"></script>
+    <script src="assets/js/utils.js"></script>
+
+    <!-- 主应用脚本 -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        // 应用配置后立即更新页面标题和主题色
+        document.getElementById('pageTitle').textContent = window.AppBranding.pageTitle;
+        document.getElementById('themeColor').setAttribute('content', window.AppBranding.themeColor);
+
+        // 调试：检查关键函数是否已加载
+        window.addEventListener('load', function () {
+            console.log('页面加载完成，检查函数状态：');
+            console.log('switchView:', typeof window.switchView);
+            console.log('handleSaveNote:', typeof window.handleSaveNote);
+            console.log('togglePasswordVisibility:', typeof window.togglePasswordVisibility);
+            console.log('refreshCaptcha:', typeof window.refreshCaptcha);
+            console.log('handleLogin:', typeof window.handleLogin);
+        });
+    </script>
+</body>
+
+</html>

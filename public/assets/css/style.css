@@ -1,0 +1,228 @@
+/*
+ * 小宇笔记 - 加密笔记管理系统
+ * 作者：宇宙小哥
+ * 项目地址：https://github.com/yuzhouxiaogegit/xiaoyu-notes
+ * 版权所有 © 2025 宇宙小哥
+ */
+
+/* 全局样式 - 保持原有设计 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 自定义组件样式 - 完全复制原编译版本的样式 */
+.tech-card {
+    border-width: 1px;
+    border-color: rgba(51, 65, 85, 0.5);
+    background-color: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.btn-primary {
+    background-color: rgb(37 99 235);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.btn-primary:hover {
+    background-color: rgb(29 78 216);
+}
+
+.btn-secondary {
+    background-color: rgb(51 65 85);
+    color: rgb(203 213 225);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.btn-secondary:hover {
+    background-color: rgb(71 85 105);
+}
+
+.btn-danger {
+    background-color: rgb(220 38 38);
+    color: rgb(255 255 255);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.btn-danger:hover {
+    background-color: rgb(185 28 28);
+}
+
+.input-tech {
+    border-width: 1px !important;
+    border-color: rgba(71, 85, 105, 0.5) !important;
+    background-color: rgba(30, 41, 59, 0.5) !important;
+    color: rgb(226 232 240) !important;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.input-tech::placeholder {
+    opacity: 1 !important;
+    color: rgb(148 163 184) !important;
+}
+
+.input-tech:focus {
+    border-color: rgb(59 130 246) !important;
+    background-color: rgba(30, 41, 59, 0.5) !important;
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity));
+}
+
+.tech-badge {
+    border-width: 1px;
+    border-color: rgba(71, 85, 105, 0.3);
+    background-color: rgba(51, 65, 85, 0.5);
+    color: rgb(203 213 225);
+}
+
+.menu-item {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: rgb(203 213 225);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.menu-item:hover {
+    background-color: rgba(51, 65, 85, 0.5);
+}
+
+.menu-item.active {
+    border-width: 1px;
+    border-color: rgba(59, 130, 246, 0.3);
+    background-color: rgba(37, 99, 235, 0.2);
+    color: rgb(147 197 253);
+}
+
+.pagination-btn {
+    background-color: rgb(51 65 85);
+    color: rgb(203 213 225);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.pagination-btn:hover {
+    background-color: rgb(71 85 105);
+}
+
+.pagination-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination-btn.active {
+    background-color: rgb(37 99 235);
+    color: rgb(255 255 255);
+}
+
+.checkbox-custom {
+    height: 1rem;
+    width: 1rem;
+    border-radius: 0.25rem;
+    border-color: rgb(71 85 105);
+    background-color: rgb(51 65 85);
+    color: rgb(37 99 235);
+}
+
+.checkbox-custom:focus {
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity));
+}
+
+/* 侧边栏样式 - 添加背景修复 */
+.sidebar {
+    background-color: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(4px);
+    border-right-width: 1px;
+    border-right-color: rgba(51, 65, 85, 0.5);
+}
+
+.sidebar-text {
+    transition-property: all;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.eye-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+/* 动画关键帧 */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.animate-toast-in {
+    animation: toastSlideIn 0.3s ease-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

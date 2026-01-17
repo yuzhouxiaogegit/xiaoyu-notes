@@ -1,0 +1,28 @@
+{
+  "name": "xiaoyu-notes",
+  "version": "1.0.0",
+  "description": "小宇笔记 - 安全加密笔记管理系统",
+  "author": "宇宙小哥",
+  "license": "MIT",
+  "keywords": [
+    "notes",
+    "encryption",
+    "cloudflare",
+    "secure-notes",
+    "privacy",
+    "pwa",
+    "burn-after-reading"
+  ],
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2025-01-17 --d1 DB=xiaoyu-notes-db --binding AI=AI",
+    "build": "node generate-manifest.js",
+    "deploy": "npm run build && wrangler pages deploy public",
+    "generate-manifest": "node generate-manifest.js",
+    "setup": "node setup-config.js"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "tailwindcss": "^3.4.0",
+    "wrangler": "^4.59.2"
+  }
+}
