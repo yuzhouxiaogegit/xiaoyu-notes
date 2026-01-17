@@ -78,9 +78,16 @@ function clearSessionData() {
                     activityTimer = null;
                 }
 
-                // 3. 清理持久化存储
+                // 3. 清理持久化存储（保留登录状态）
+                const loginToken = localStorage.getItem('login_token');
+                const adminKey = localStorage.getItem('admin_key');
+                
                 localStorage.clear();
-                sessionStorage.clear(); // 建议加上这个
+                sessionStorage.clear();
+                
+                // 恢复登录状态
+                if (loginToken) localStorage.setItem('login_token', loginToken);
+                if (adminKey) localStorage.setItem('admin_key', adminKey);
 
                 // 4. 清理 Service Worker 缓存 (你新增的逻辑)
                 if ('caches' in window) {
@@ -111,9 +118,16 @@ window.resetAll = async function() {
         '⚠️ 确认清除所有本地数据？此操作不可撤销，所有配置和本地存储将被永久删除。',
         async () => {
             try {
-                // 1. 清理各种存储机制
+                // 1. 清理各种存储机制（保留登录状态）
+                const loginToken = localStorage.getItem('login_token');
+                const adminKey = localStorage.getItem('admin_key');
+                
                 localStorage.clear();
                 sessionStorage.clear();
+                
+                // 恢复登录状态
+                if (loginToken) localStorage.setItem('login_token', loginToken);
+                if (adminKey) localStorage.setItem('admin_key', adminKey);
                 
                 // 2. 尝试清理 IndexedDB (如果应用中有使用)
                 if (window.indexedDB && window.indexedDB.databases) {

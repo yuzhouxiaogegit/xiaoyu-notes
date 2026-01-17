@@ -74,6 +74,33 @@ async function handleSaveNote() {
     }
 }
 
+// 处理刷新按钮点击
+async function handleRefresh() {
+    // 防止重复点击
+    if (AppConfig.isRefreshing) {
+        return;
+    }
+    
+    AppConfig.isRefreshing = true;
+    
+    try {
+        showToast('正在刷新...', 'info');
+        
+        // 重新加载笔记列表和分类数据
+        await Promise.all([
+            loadNotesList(),
+            loadCategories()
+        ]);
+        
+        showToast('刷新完成', 'success');
+    } catch (error) {
+        console.error('刷新失败:', error);
+        showToast('刷新失败，请重试', 'error');
+    } finally {
+        AppConfig.isRefreshing = false;
+    }
+}
+
 // 加载笔记列表
 async function loadNotesList() {
     // 检查是否已登录（开发环境跳过检查）

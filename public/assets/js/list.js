@@ -22,7 +22,7 @@ async function loadCategories() {
     
     tabsDiv.innerHTML = `
         <button onclick="filterByCategory('all')" 
-            class="px-4 py-2 rounded-lg text-sm font-bold ${AppConfig.currentCategory === 'all' ? 'btn-primary text-white' : 'btn-secondary'}">
+            class="category-tab px-4 py-2 rounded-lg text-sm font-bold ${AppConfig.currentCategory === 'all' ? 'active' : ''}">
             全部
         </button>
     `;
@@ -30,8 +30,9 @@ async function loadCategories() {
     data.categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.onclick = () => filterByCategory(cat.code);
-        btn.className = `px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${AppConfig.currentCategory === cat.code ? 'btn-primary text-white' : 'btn-secondary'}`;
+        btn.className = `category-tab px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${AppConfig.currentCategory === cat.code ? 'active' : ''}`;
         btn.textContent = `${cat.name} (${cat.count})`; // textContent is safe, no escaping needed
+        btn.title = cat.name; // 完整名称显示在 tooltip
         tabsDiv.appendChild(btn);
     });
     } catch (error) {
@@ -45,11 +46,15 @@ async function loadCategories() {
 }
 
 // 分类筛选
-function filterByCategory(category) {
+async function filterByCategory(category) {
     AppConfig.currentCategory = category;
-    AppConfig.currentPage = 1;
-    loadNotesList();
-    loadCategories();
+    AppConfig.currentPage = 1; // 重置到第一页
+    
+    // 重新加载笔记列表和分类数据
+    await Promise.all([
+        loadNotesList(),
+        loadCategories()
+    ]);
 }
 
 // 分页渲染

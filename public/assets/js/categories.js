@@ -192,6 +192,45 @@ async function handleDeleteCategory(code, name) {
     );
 }
 
+// 渲染分类标签
+function renderCategoryTabs(categories) {
+    const tabsDiv = document.getElementById('categoryTabs');
+    if (!tabsDiv) return;
+    
+    let tabsHtml = `
+        <button onclick="filterByCategory('all')" 
+            class="category-tab px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${AppConfig.currentCategory === 'all' ? 'active' : ''}">
+            全部
+        </button>
+    `;
+    
+    categories.forEach(cat => {
+        const isActive = AppConfig.currentCategory === cat.code;
+        const displayName = cat.name.length > 10 ? cat.name.substring(0, 10) + '...' : cat.name;
+        tabsHtml += `
+            <button onclick="filterByCategory('${escapeHtml(cat.code)}')" 
+                class="category-tab px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap ${isActive ? 'active' : ''}"
+                title="${escapeHtml(cat.name)}">
+                ${escapeHtml(displayName)} (${cat.count || 0})
+            </button>
+        `;
+    });
+    
+    tabsDiv.innerHTML = tabsHtml;
+}
+
+// 按分类筛选
+async function filterByCategory(category) {
+    AppConfig.currentCategory = category;
+    AppConfig.currentPage = 1; // 重置到第一页
+    
+    // 重新加载笔记列表
+    await loadNotesList();
+    
+    // 重新加载分类数据以更新标签状态
+    await loadCategories();
+}
+
 // 加载分类到下拉菜单
 async function loadCategoryOptions() {
     // 检查是否已登录且有管理员密钥（开发环境跳过检查）

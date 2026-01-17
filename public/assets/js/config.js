@@ -15,7 +15,9 @@ const AppConfig = {
     currentView: 'write',
     currentCategory: 'all',
     selectedNotes: new Set(),
-    categories: []
+    categories: [],
+    isViewSwitching: false, // 防止视图切换竞态条件
+    isRefreshing: false // 防止重复刷新
 };
 
 // 检查是否为开发环境

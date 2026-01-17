@@ -33,6 +33,24 @@ function isLoggedIn() {
     }
 }
 
+// 恢复登录状态（从localStorage恢复ADMIN_KEY）
+async function restoreLoginState() {
+    const token = localStorage.getItem('login_token');
+    const adminKey = localStorage.getItem('admin_key');
+    
+    if (token && adminKey && isLoggedIn()) {
+        // 恢复ADMIN_KEY到内存
+        AppConfig.ADMIN_KEY = adminKey;
+        return true;
+    }
+    
+    // 如果任何一个缺失，清理所有登录信息
+    localStorage.removeItem('login_token');
+    localStorage.removeItem('admin_key');
+    AppConfig.ADMIN_KEY = '';
+    return false;
+}
+
 // 应用初始化
 async function init() {
     try {
@@ -46,7 +64,10 @@ async function init() {
             return;
         }
         
-        if (isLoggedIn()) {
+        // 恢复登录状态
+        const isLoggedInState = await restoreLoginState();
+        
+        if (isLoggedInState) {
             // 已登录，显示主界面
             document.getElementById('app').innerHTML = renderDashboard();
             
@@ -88,38 +109,50 @@ async function init() {
 
 // 切换视图
 async function switchView(view) {
-    AppConfig.currentView = view;
-    
-    // 移动端自动关闭菜单
-    if (window.innerWidth < 1024) {
-        closeMobileMenu();
+    // 防止重复切换
+    if (AppConfig.currentView === view && AppConfig.isViewSwitching) {
+        return;
     }
     
-    document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
-    const menuId = 'menu' + view.charAt(0).toUpperCase() + view.slice(1);
-    document.getElementById(menuId)?.classList.add('active');
+    AppConfig.isViewSwitching = true;
+    AppConfig.currentView = view;
     
-    // 更新快速访问按钮的高亮状态
-    updateQuickAccessHighlight(view);
-    
-    const content = document.getElementById('mainContent');
-    
-    // 渲染对应视图（所有模块已预加载）
-    if (view === 'write') {
-        content.innerHTML = renderWriteView();
-        loadCategoryOptions();
-        // 初始化字数统计
-        updateCharCount();
-    } else if (view === 'list') {
-        content.innerHTML = renderListView();
-        // 自动刷新笔记列表和分类数据
-        loadNotesList();
-        loadCategories();
-    } else if (view === 'categories') {
-        content.innerHTML = renderCategoriesView();
-        loadCategoriesList();
-    } else if (view === 'settings') {
-        content.innerHTML = renderSettingsView();
+    try {
+        // 移动端自动关闭菜单
+        if (window.innerWidth < 1024) {
+            closeMobileMenu();
+        }
+        
+        document.querySelectorAll('.menu-item').forEach(btn => btn.classList.remove('active'));
+        const menuId = 'menu' + view.charAt(0).toUpperCase() + view.slice(1);
+        document.getElementById(menuId)?.classList.add('active');
+        
+        // 更新快速访问按钮的高亮状态
+        updateQuickAccessHighlight(view);
+        
+        const content = document.getElementById('mainContent');
+        
+        // 渲染对应视图（所有模块已预加载）
+        if (view === 'write') {
+            content.innerHTML = renderWriteView();
+            loadCategoryOptions();
+            // 初始化字数统计
+            updateCharCount();
+        } else if (view === 'list') {
+            content.innerHTML = renderListView();
+            // 自动刷新笔记列表和分类数据
+            await Promise.all([
+                loadNotesList(),
+                loadCategories()
+            ]);
+        } else if (view === 'categories') {
+            content.innerHTML = renderCategoriesView();
+            loadCategoriesList();
+        } else if (view === 'settings') {
+            content.innerHTML = renderSettingsView();
+        }
+    } finally {
+        AppConfig.isViewSwitching = false;
     }
 }
 

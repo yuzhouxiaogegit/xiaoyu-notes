@@ -12,6 +12,16 @@ window.currentCaptchaToken = window.currentCaptchaToken || null;
 
 // 启动活动监听
 function startActivityMonitor() {
+    // 如果已经启动，先清理旧的监听器
+    if (window.activityTimer) {
+        clearInterval(window.activityTimer);
+        // 移除旧的事件监听器
+        const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+        events.forEach(event => {
+            document.removeEventListener(event, updateActivity);
+        });
+    }
+    
     // 监听用户活动
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
     events.forEach(event => {
@@ -67,8 +77,19 @@ async function renewToken() {
 function handleTokenExpired() {
     if (window.activityTimer) {
         clearInterval(window.activityTimer);
+        window.activityTimer = null;
     }
+    
+    // 清理事件监听器
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    events.forEach(event => {
+        document.removeEventListener(event, updateActivity);
+    });
+    
+    // 清理所有登录相关数据
     localStorage.removeItem('login_token');
+    localStorage.removeItem('admin_key');
+    AppConfig.ADMIN_KEY = '';
     showToast('登录已过期，请重新登录', 'warning');
     setTimeout(() => location.reload(), 2000);
 }
@@ -119,8 +140,9 @@ async function handleLogin() {
         }
         
         if (result && result.status === 'OK') {
-            // 保存登录信息
+            // 保存登录信息到localStorage
             localStorage.setItem('login_token', result.token);
+            localStorage.setItem('admin_key', result.admin_key);
             AppConfig.ADMIN_KEY = result.admin_key;
             
             showToast('登录成功', 'success');
@@ -151,8 +173,19 @@ function handleLogout() {
         () => {
             if (window.activityTimer) {
                 clearInterval(window.activityTimer);
+                window.activityTimer = null;
             }
-            localStorage.clear();
+            
+            // 清理事件监听器
+            const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+            events.forEach(event => {
+                document.removeEventListener(event, updateActivity);
+            });
+            
+            // 清理所有登录相关数据
+            localStorage.removeItem('login_token');
+            localStorage.removeItem('admin_key');
+            AppConfig.ADMIN_KEY = '';
             showToast('已退出登录', 'success');
             setTimeout(() => location.reload(), 500);
         },

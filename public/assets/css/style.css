@@ -226,3 +226,21 @@ html {
 .animate-spin {
     animation: spin 1s linear infinite;
 }
+
+/* 分类标签样式 */
+.category-tab {
+    background-color: rgb(51 65 85);
+    color: rgb(203 213 225);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+}
+
+.category-tab:hover {
+    background-color: rgb(71 85 105);
+}
+
+.category-tab.active {
+    background-color: rgb(37 99 235);
+    color: rgb(255 255 255);
+}
